@@ -1,4 +1,3 @@
-import json
 import pygame as pg
 
 def makeColumn(map, index):
@@ -7,8 +6,6 @@ def makeColumn(map, index):
 def makeRow(map, index):
     return [x.block for x in map[index]]
 
-# global map
-# map = []
 
 
 class BlockNode:
@@ -43,7 +40,7 @@ class BlockNode:
                 self.directions[direction] = self
             for x in range(self.coords[0], -1, -1):
                
-                if path[x].north:
+                if path[x].north or x != 0 and path[x-1].south:
                     
                     self.directions[direction] = path[x]
                     BlockNode.graph.add((self.id, path[x].id))
@@ -52,7 +49,7 @@ class BlockNode:
             if self.coords[0] == 0:
                 self.directions[direction] = self
             for x in range(self.coords[1], -1, -1):
-                if path[x].west:
+                if path[x].west or (x != 0 and path[x-1].east):
                     self.directions[direction] = path[x]
                     BlockNode.graph.add((self.id, path[x].id))
                     break
@@ -60,7 +57,7 @@ class BlockNode:
             if self.coords[0] == len(path) - 1:
                 self.directions[direction] = self
             for x in range(self.coords[0], len(path)):
-                if path[x].south:
+                if path[x].south or( x != len(path) - 1 and path[x+1].north):
                     self.directions[direction] = path[x]
                     BlockNode.graph.add((self.id, path[x].id))
                     break
@@ -68,7 +65,7 @@ class BlockNode:
             if self.coords[0] == len(path) - 1:
                 self.directions[direction] = self
             for x in range(self.coords[1], len(path)):
-                if path[x].east:
+                if path[x].east or (x != len(path) - 1 and path[x+1].west):
                     self.directions[direction] = path[x]
                     BlockNode.graph.add((self.id, path[x].id))
                     break
@@ -88,6 +85,7 @@ class BlockNode:
         array = [int(bit) for bit in padded_binary_str]
         print(array)
         self.west, self.south, self.east, self.north = array if len(array) == 4 else (0,0,0,0)
+
         
 
 

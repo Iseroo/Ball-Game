@@ -71,16 +71,17 @@ class MainGame:
                         
                         if id != None and not self.startBall and not self.editMode:
                             self.ball.move(*self.map.get_coords_by_id(id.id))
-                            self.map.start = id
+                            self.map.start = id.id
                             self.path = self.map.find_path()
                             print('path', self.path)
                         
-                        if self.editMode:
-                            # id.block.rotate()
-                            pass
+                        if self.editMode and id != None:
+                            id.block.rotate()
+                            self.map.setup_directions()
                         
                         # click start button
                         if self.buttonPos[0] <= mouse_pos[0] <= self.buttonPos[0] + 100 and self.buttonPos[1] <= mouse_pos[1] <= self.buttonPos[1] +50:
+                            self.editMode = False
                             self.startBall = not self.startBall
                             if self.startBall:
                                 self.path = self.map.find_path()
