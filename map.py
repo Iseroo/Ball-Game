@@ -14,15 +14,19 @@ class Map:
     def readmap(self):
         with open(self.path, 'r') as f:
             data = json.load(f)
+
             for index, vector in enumerate(data):
                 temp = []
                 for index2, item in enumerate(vector):
 
                     temp.append(PGBlock(BlockNode(item['north'], item['west'], item['south'], item['east'], (index, index2)), index2*100, index*100))
                 # print([x.id for x in temp])
+
                 self.map.append(temp)
+
     
     def setup_directions(self):
+        BlockNode.graph = set()
         for x in self.map:
             for x2 in x:
                 x2.block.setup_directions(self.map)

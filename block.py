@@ -22,7 +22,8 @@ class BlockNode:
         self.directions = {'north': None, 'south': None, 'east': None, 'west': None}
         
     def __str__(self) -> str:
-        return f'{ "| " if self.west else "  "}{"二" if self.north and self.south else "▔▔" if self.north else "__" if self.south else "  "}{" |" if self.east else "  "}'
+        return f'{self.west} {self.south} {self.east} {self.north}'
+        # return f'{ "| " if self.west else "  "}{"二" if self.north and self.south else "▔▔" if self.north else "__" if self.south else "  "}{" |" if self.east else "  "}'
 
     def setup_directions(self, map):
         
@@ -35,6 +36,7 @@ class BlockNode:
             self.find_next('west', makeRow(map, self.coords[0]))
 
     def find_next(self, direction, path):
+        
         if direction == 'north':
             if self.coords[0] == 0:
                 self.directions[direction] = self
@@ -66,6 +68,7 @@ class BlockNode:
                 self.directions[direction] = self
             for x in range(self.coords[1], len(path)):
                 if path[x].east or (x != len(path) - 1 and path[x+1].west):
+                    
                     self.directions[direction] = path[x]
                     BlockNode.graph.add((self.id, path[x].id))
                     break
@@ -77,17 +80,27 @@ class BlockNode:
 
 
     def rotate(self):
+        # pass
+        # self.coords = (,)
         lst = [self.west, self.south, self.east, self.north]
         binary_str = ''.join(str(bit) for bit in lst)
         incremented_int = int(binary_str, 2) + 1
         padded_binary_str = bin(incremented_int)[2:].zfill(len(lst))
-        print(lst,int(binary_str, 2), incremented_int, bin(incremented_int))
         array = [int(bit) for bit in padded_binary_str]
-        print(array)
         self.west, self.south, self.east, self.north = array if len(array) == 4 else (0,0,0,0)
-
+        return self.validate_map_walls()
         
-
+    def validate_map_walls(self):
+        blockid = self.id
+        if (blockid % 7) % 6 == 0:
+            self.east = 1
+        if blockid >= 42 :
+            self.south = 1
+        if blockid % 7 == 0:
+            self.west = 1
+        if blockid <= 6 :
+            self.north = 1
+        return [self.west, self.south, self.east, self.north]
 
 
             
@@ -103,8 +116,6 @@ class PGBlock:
         self.rect = (self.x, self.y, self.width, self.height)
         self.coords = self.block.coords
         self.id = self.block.id
-        self.directions = self.block.directions
-        self.graph = self.block.graph
 
 
     def draw(self, screen):
@@ -112,19 +123,23 @@ class PGBlock:
         #draw a rect that not filled
         pg.draw.rect(screen, self.color, self.rect, 1)
         
-
-
-
+        # if self.block.id == 0:
+# 
+        # print(self.id)
         if self.block.north:
             pg.draw.line(screen, (0,0,0), (self.x, self.y), (self.x + self.width, self.y), self.wide)
 
+
         if self.block.south:
-            pg.draw.line(screen, (0,0,0), (self.x, self.y + self.width), (self.x + self.width, self.y + self.width),self.wide)
+            # pass
+            pg.draw.line(screen, (0,0,0), (self.x, self.y + self.width), (self.x + self.width, self.y + self.width ),self.wide)
 
         if self.block.east:
+            # pass
             pg.draw.line(screen, (0,0,0), (self.x + self.width, self.y), (self.x + self.width, self.y + self.width),self.wide)
 
         if self.block.west:
+            # pass
             pg.draw.line(screen, (0,0,0), (self.x, self.y), (self.x, self.y + self.width),self.wide)
 
     def get_center(self):
@@ -133,5 +148,11 @@ class PGBlock:
     def clicked_inside(self, pos):
         # print(pos, self.x, self.y, self.width, self.height)
         return self.x <= pos[0] <= self.x + self.width and self.y <= pos[1] <= self.y + self.height
+    
+    def rotate(self):
+        return self.block.rotate()
+        
+        
+        # self.x, self.y = 0,0
 # def getCoordsById(id):
     

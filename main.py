@@ -4,7 +4,6 @@ import pygame as pg
 from pygame.locals import *
 from random import randint
 from ball import *
-
 from map import Map
 
 
@@ -20,7 +19,8 @@ class MainGame:
         # set window
         self.screen = pg.display.set_mode((self.width, self.height))
         # set title
-        pg.display.set_caption('Map')
+        self.title = "Map"
+        self.setTitle()
         # set clock
         self.clock = pg.time.Clock()
         # set fps
@@ -49,7 +49,7 @@ class MainGame:
         waiter = 0
         next_move = self.find_next_move()
 
-
+        
         while running:
             self.screen.fill((255, 255, 255))
             mouse_pos = pg.mouse.get_pos()
@@ -76,8 +76,9 @@ class MainGame:
                             print('path', self.path)
                         
                         if self.editMode and id != None:
-                            id.block.rotate()
+                            self.rotate_block(id)
                             self.map.setup_directions()
+                            self.path = self.map.find_path()
                         
                         # click start button
                         if self.buttonPos[0] <= mouse_pos[0] <= self.buttonPos[0] + 100 and self.buttonPos[1] <= mouse_pos[1] <= self.buttonPos[1] +50:
@@ -98,6 +99,8 @@ class MainGame:
                 if event.type == KEYDOWN:
                     if event.key == K_e:
                         self.editMode = not self.editMode
+                        self.title = "Map" if not self.editMode else "EditMode"
+                        self.setTitle()
 
 
                 
@@ -140,7 +143,8 @@ class MainGame:
 
     def setup_map(self):
         self.map = Map('map.json', 11, 37)
-        self.map.readmap()
+        print(len(self.map.map))
+        # self.map.readmap()
     
     def draw_map(self):
         for x in self.map.map:
@@ -191,10 +195,20 @@ class MainGame:
         pg.draw.line(self.screen, (255, 0, 0), line1_start, line1_end, 5)
         pg.draw.line(self.screen, (255, 0, 0), line2_start, line2_end, 5)
 
+    def rotate_block(self, id):
+        rotated = id.rotate()
+        blockid = id.block.id
+        if blockid % 6 != 0:
+            self.map.map[(blockid-1) // 7 ][(blockid-1) % 7].block.east = rotated[0]
+        if blockid < 42 :
+            self.map.map[(blockid+7) // 7  ][(blockid+7) % 7].block.north = rotated[1]
+        if (blockid % 7) % 6 != 0:
+            self.map.map[(blockid+1) // 7 ][(blockid+1) % 7].block.west = rotated[2]
+        if blockid > 6 :    
+            self.map.map[(blockid-7) // 7  ][(blockid-7) % 7].block.south = rotated[3]
 
-
-
-
+    def setTitle(self):
+        pg.display.set_caption(self.title)
 
 
 if __name__ == '__main__':
