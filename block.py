@@ -97,7 +97,7 @@ class BlockNode:
         
     def validate_map_walls(self):
         blockid = self.id
-        if (blockid % self.map_size) % (self.map_size-1) == 0:
+        if (blockid % self.map_size) != 0 and (blockid % self.map_size) % (self.map_size-1)  == 0:
             self.east = 1
         if blockid >= self.map_size * (self.map_size ) - self.map_size:
             self.south = 1

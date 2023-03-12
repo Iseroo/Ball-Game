@@ -22,7 +22,7 @@ class Map:
             for x2 in x:
                 temp.append(str(x2.block))
             map_str_list.append(temp)
-        print(map_str_list)
+        # print(map_str_list)
         return str(map_str_list)
         
     

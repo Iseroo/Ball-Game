@@ -144,7 +144,7 @@ class MainGame:
         pg.quit()
 
     def setup_map(self):
-        self.map = Map('map.json', 0, 0)
+        self.map = Map('./maps/77e5f9308fbd04951e3db306e67e8ccd.json', 0, 0)
         print(len(self.map.map))
         # self.map.readmap()
     
