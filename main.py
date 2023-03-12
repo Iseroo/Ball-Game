@@ -30,10 +30,11 @@ class MainGame:
         self.setup_map()
 
         # set ball
-        x,y = self.map.get_coords_by_id(11)
-        self.ball = Ball(x,y, 40, (0, 0, 207))
+        x,y = self.map.get_coords_by_id(0)
+        self.ball = Ball(x,y, (700/self.map.size[0])//2 - 10, (0, 0, 207))
 
         self.path = self.map.find_path()
+        # print(self.map)
 
     
         self.buttonPos = None
@@ -63,6 +64,7 @@ class MainGame:
                 
                 if event.type == QUIT:
                     running = False
+                    self.map.save_map()
                 if event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                        
@@ -142,7 +144,7 @@ class MainGame:
         pg.quit()
 
     def setup_map(self):
-        self.map = Map('map.json', 11, 37)
+        self.map = Map('map.json', 0, 0)
         print(len(self.map.map))
         # self.map.readmap()
     
@@ -187,10 +189,12 @@ class MainGame:
 
     def draw_cross_end(self):
         # draw a red cross on the end of the path
-        x, y = self.map.get_coords_by_id(self.map.end)
+        x, y = self.map.get_coords_by_id(self.map.end) 
 
-        line1_start, line1_end = (x - 30, y -30), (x + 30, y + 30)
-        line2_start, line2_end = (x - 30, y + 30), (x + 30, y - 30)
+
+        scale = self.map.scale * 30
+        line1_start, line1_end = (x - scale, y -scale), (x + scale, y + scale)
+        line2_start, line2_end = (x - scale, y + scale), (x + scale, y - scale)
 
         pg.draw.line(self.screen, (255, 0, 0), line1_start, line1_end, 5)
         pg.draw.line(self.screen, (255, 0, 0), line2_start, line2_end, 5)
@@ -198,14 +202,14 @@ class MainGame:
     def rotate_block(self, id):
         rotated = id.rotate()
         blockid = id.block.id
-        if blockid % 6 != 0:
-            self.map.map[(blockid-1) // 7 ][(blockid-1) % 7].block.east = rotated[0]
-        if blockid < 42 :
-            self.map.map[(blockid+7) // 7  ][(blockid+7) % 7].block.north = rotated[1]
-        if (blockid % 7) % 6 != 0:
-            self.map.map[(blockid+1) // 7 ][(blockid+1) % 7].block.west = rotated[2]
-        if blockid > 6 :    
-            self.map.map[(blockid-7) // 7  ][(blockid-7) % 7].block.south = rotated[3]
+        if blockid % self.map.size[0] != 0:
+            self.map.map[(blockid-1) // self.map.size[0] ][(blockid-1) % self.map.size[0]].block.east = rotated[0]
+        if blockid < self.map.size[0] * (self.map.size[1] -1) :
+            self.map.map[(blockid+self.map.size[0]) // self.map.size[0]  ][(blockid+self.map.size[0]) % self.map.size[0]].block.north = rotated[1]
+        if (blockid % self.map.size[0] ) % (self.map.size[0] -1) != 0:
+            self.map.map[(blockid+1) // self.map.size[0] ][(blockid+1) % self.map.size[0]].block.west = rotated[2]
+        if blockid > self.map.size[0] -1 :    
+            self.map.map[(blockid-self.map.size[0]) // self.map.size[0]  ][(blockid-self.map.size[0]) % self.map.size[0]].block.south = rotated[3]
 
     def setTitle(self):
         pg.display.set_caption(self.title)

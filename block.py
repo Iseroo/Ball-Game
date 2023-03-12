@@ -11,7 +11,7 @@ def makeRow(map, index):
 class BlockNode:
     id = 0
     graph = set()
-    def __init__(self, north, west, south, east, coords) -> None:
+    def __init__(self, north, west, south, east, coords, map_size= 7) -> None:
         self.id = BlockNode.id
         BlockNode.id += 1
         self.north = north
@@ -20,6 +20,8 @@ class BlockNode:
         self.east = east
         self.coords = coords
         self.directions = {'north': None, 'south': None, 'east': None, 'west': None}
+        self.map_size = map_size
+        self.validate_map_walls()
         
     def __str__(self) -> str:
         return f'{self.west} {self.south} {self.east} {self.north}'
@@ -84,39 +86,44 @@ class BlockNode:
         # self.coords = (,)
         lst = [self.west, self.south, self.east, self.north]
         binary_str = ''.join(str(bit) for bit in lst)
+        print(binary_str)
         incremented_int = int(binary_str, 2) + 1
         padded_binary_str = bin(incremented_int)[2:].zfill(len(lst))
         array = [int(bit) for bit in padded_binary_str]
+        print(array)
         self.west, self.south, self.east, self.north = array if len(array) == 4 else (0,0,0,0)
+        # return [self.west, self.south, self.east, self.north]
         return self.validate_map_walls()
         
     def validate_map_walls(self):
         blockid = self.id
-        if (blockid % 7) % 6 == 0:
+        if (blockid % self.map_size) % (self.map_size-1) == 0:
             self.east = 1
-        if blockid >= 42 :
+        if blockid >= self.map_size * (self.map_size ) - self.map_size:
             self.south = 1
-        if blockid % 7 == 0:
+        if blockid % self.map_size == 0:
             self.west = 1
-        if blockid <= 6 :
+        if blockid <= self.map_size - 1 :
             self.north = 1
         return [self.west, self.south, self.east, self.north]
 
 
             
 class PGBlock:
-    def __init__(self, block, x ,y) -> None:
+    def __init__(self, block, x ,y, size= (100,100)) -> None:
         self.block = block
         self.x = x+50
         self.y = y+50
-        self.width = 100
-        self.height = 100
+        self.width = size[0]
+        self.height = size[1]
         self.wide = 8
         self.color = (0, 0, 0)
         self.rect = (self.x, self.y, self.width, self.height)
         self.coords = self.block.coords
         self.id = self.block.id
 
+    def __str__(self) -> str:
+        return f'{self.block}'
 
     def draw(self, screen):
         
